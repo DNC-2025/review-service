@@ -1,0 +1,32 @@
+Relazioni logiche del Review Service  : 
+
+reviews.user_id → User Service  : Indica quale utente ha scritto la recensione
+
+                                  La validazione viene fatta via API verso User Service
+
+                                 Nessuna foreign key nel DB
+
+
+reviews.content_id → Catalog Service : Indica a quale contenuto è riferita la recensione
+
+                                       Il titolo e il tipo del contenuto vengono presi via API dal Catalog Service
+
+                                       Nessuna foreign key nel DB
+
+
+Opzionale: Review Service → Cast Service tramite Catalog : Se serve filtrare recensioni per attore/regista
+
+                                                           Si usano API: Catalog restituisce cast → filtro via ID contenuto
+
+Ecco la mia bozza visuale (creata grazie al ai) :
+┌───────────────────────────┐
+│          reviews           │
+├───────────────────────────┤
+│ id          BIGINT  PK     │
+│ user_id     BIGINT         │  → riferimento logico a User Service
+│ content_id  BIGINT         │  → riferimento logico a Catalog Service
+│ rating      INT (1–5)      │
+│ review_text TEXT           │
+│ created_at  DATETIME       │
+│ updated_at  DATETIME       │
+└───────────────────────────┘
