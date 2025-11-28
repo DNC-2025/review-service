@@ -1,4 +1,4 @@
-# qui faccio creare la tabella 
+1                       # qui faccio creare la tabella 
 from fastapi import FastAPI
 from app.database.config import Base, engine
 from app.models.tables import Review 
