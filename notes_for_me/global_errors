@@ -1,0 +1,30 @@
+Un gestore globale delle eccezioni è un sistema centralizzato che:
+
+ intercetta tutti questi errori.
+ li trasforma in risposte JSON pulite.
+ mantiene il server stabile.
+ permette di controllare cosa il client vede.
+
+Invece di far tornare al frontend errori brutti.
+
+
+Perche?
+- Un conto sono gli errori che io ho gia impostato e messo in funzione.
+- Un conto sono gli errori imprevisti :
+-Problemi con MySQL
+-Tabelle mancanti (migrations)
+-Errori di scrittura CRUD
+-Crash del codice
+-Problemi con i dati fake
+-Bug logici imprevisti
+
+Se non hai un gestore globale:
+-gli errori esplodono sotto forma di Python traceback (pericoloso)
+-il frontend riceve risposte inaspettate
+-Swagger mostra errori confusi
+-il server rischia di crashare
+-i messaggi sono incoerenti e disordinati
+
+-Utente → Router → Endpoint → Logica → DB → Risposta
+Se durante uno di questi step avviene un errore:
+-Utente → Router → Boom! Exception → exception handler → JSON pulito
