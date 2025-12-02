@@ -3,12 +3,12 @@ from app.models.tables import Review
 
 # create ---------------------------------------------------------------------------------------------------------------------
 
-#def create_review(db: Session , user_id : int , content_id : int , rating : int , review_text : str = None) :
- #   new_review = review = Review(user_id=user_id , content_id = content_id , rating= rating , review_text = review_text)
-  #  db.add(new_review)
-  #  db.commit()
-  #  db.refresh(new_review)
-  #  return new_review
+def create_review(db: Session , user_id : int , content_id : int , rating : int , review_text : str = None) :
+    new_review = review = Review(user_id=user_id , content_id = content_id , rating= rating , review_text = review_text)
+    db.add(new_review)
+    db.commit()
+    db.refresh(new_review)
+    return new_review
 # lho commentato perche cosi per sbaglio nonne creo una doppia tabella.
 
 # read ---------------------------------------------------------------------------------------------------------------------
