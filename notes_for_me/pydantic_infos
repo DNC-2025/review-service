@@ -1,0 +1,9 @@
+Perché serve Pydantic?
+- Validazione automatica dei dati.
+- Serializzazione dell’output.
+- FastAPI deve restituire JSON → Pydantic li trasforma automaticamente.
+- Documentazione Swagger , Gli schemi definiscono automaticamente la documentazione visibile su:
+/docs
+/redoc
+
+
