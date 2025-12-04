@@ -1,0 +1,24 @@
+Che cos^è la paginazione
+
+La paginazione è il processo di suddividere una lista di dati (ad esempio recensioni, utenti, prodotti) in “pagine” più piccole,
+restituendo solo un sottoinsieme alla volta invece dell’intera collezione.
+
+Perché serve
+
+-Prestazioni
+-Non carichi migliaia o milioni di record in memoria.
+-La query al database diventa veloce e scalabile.
+-Banda e rete
+-Riduce la quantità di dati inviati al client → meno latenza e meno consumo di rete.
+-Usabilità
+-L^utente vede i dati a blocchi (es. pagina 1, 2, 3).
+-Si può implementare “scroll infinito” o bottoni "next/prev".
+-Scalabilità
+-Permette di gestire dataset grandi senza appesantire server o client.
+
+La paginazione è come dividere un lungo elenco in pagine di un libro.
+Immagina una lista di 10.000 recensioni: mostrarle tutte in una volta sarebbe confuso e pesante.
+La paginazione dice: “mostriamo solo 20 recensioni per volta” e l^utente può andare avanti o indietro tra le pagine.
+
+In sostanza, limitare + saltare + dare la possibilità di navigare.
+

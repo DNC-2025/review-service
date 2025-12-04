@@ -1,5 +1,5 @@
 1                       # qui faccio creare la tabella 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI , HTTPException                 
 from app.database.config import Base, engine
 #from app.models.tables import Review 
 from app.routers.review_router import router as review_router
@@ -7,7 +7,6 @@ from exceptions.handlers import (
     http_exception_handler,
     sqlalchemy_exception_handler,
     unhandled_exception_handler,
-    HTTPException,
     SQLAlchemyError
 )
 
