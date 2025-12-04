@@ -1,0 +1,15 @@
+Il  ResponseModel rende tutte le risposte dell’API uniformi (success, message, data).
+
+Gli exception handler globali trasformano ogni errore (HTTPException, SQLAlchemyError, Exception…) in una risposta con ResponseModel.
+
+Se ritorna ResponseModel(success=False) con status 200, tecnicamente funziona ma non segue lo standard REST.
+
+REST richiede che errori come “review non trovata” siano 404, non 200.
+
+Usare raise HTTPException collega il codice HTTP corretto alla risposta.
+
+Gli handler globali catturano l’eccezione e convertono automaticamente l’errore nel tuo JSON standard.
+
+Risultato: codici HTTP corretti + JSON uniforme + comportamento professionale.
+
+Ora il router è più robusto, più chiaro e più vicino agli standard enterprise.

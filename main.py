@@ -1,5 +1,5 @@
 1                       # qui faccio creare la tabella 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from app.database.config import Base, engine
 #from app.models.tables import Review 
 from app.routers.review_router import router as review_router
@@ -21,6 +21,11 @@ app = FastAPI(title="Review-Service" ,
 Base.metadata.create_all(bind=engine)
 
 
+# E qui  ci sono li   global handlers 
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
+
 @app.get("/", tags=["Root"])
 def read_root():
     return {"message": "Benvenuto al Review-Service API. Usa /docs per vedere gli endpoint disponibili."}
@@ -28,8 +33,3 @@ def read_root():
 # il router per le recensioni
 app.include_router(review_router)   # ** Senza questo comando, gli endpoint non funzionano.**  Diciamo come il base metadata create all.
 
-
-# E qui  ci sono li   global handlers 
-app.add_exception_handler(HTTPException, http_exception_handler)
-app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
-app.add_exception_handler(Exception, unhandled_exception_handler)

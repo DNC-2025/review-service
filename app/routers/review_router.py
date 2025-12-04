@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.config import get_db
@@ -37,7 +37,7 @@ def create_review_endpoint(review_data: ReviewCreate, db: Session = Depends(get_
 def get_review_by_id_endpoint(review_id: int, db: Session = Depends(get_db)):
     review = get_review_by_id(db, review_id)
     if not review:
-        return ResponseModel(success=False, message="Review not found")
+        raise HTTPException(status_code=404, detail="Review not found")
     return ResponseModel(success=True, data=review)
 
 # ---------------------------- READ by USER ---------------------------
@@ -62,7 +62,7 @@ def update_review_endpoint(review_id: int, update_data: ReviewUpdate, db: Sessio
         review_text=update_data.review_text
     )
     if not review:
-        return ResponseModel(success=False, message="Review not found")
+        raise HTTPException(status_code=404, detail="Review not found")
     return ResponseModel(success=True, message="Review updated successfully", data=review)
 
 # ---------------------------- DELETE --------------------------------
@@ -70,7 +70,5 @@ def update_review_endpoint(review_id: int, update_data: ReviewUpdate, db: Sessio
 def delete_review_endpoint(review_id: int, db: Session = Depends(get_db)):
     review = delete_review(db, review_id)
     if not review:
-        return ResponseModel(success=False, message="Review not found")
+        raise HTTPException(status_code=404, detail="Review not found")
     return ResponseModel(success=True, message="Review deleted successfully")
-
-
