@@ -1,0 +1,18 @@
+FastAPI genera automaticamente la documentazione
+
+Quando crei un endpoint, FastAPI legge i parametri della funzione, i tipi, i response_model e crea una pagina Swagger (/docs) e Redoc (/redoc).
+
+Questo significa che anche senza scrivere nulla di extra, hai già una documentazione di base.
+
+Cos’è possibile personalizzare?
+Per rendere la documentazione più chiara e utile, FastAPI ti permette di aggiungere descrizioni, riepiloghi, esempi, codici di risposta HTTP, ecc.
+
+Perché è utile?
+
+Gli altri sviluppatori capiscono subito cosa fa l’API.
+
+Postman/Swagger mostrano esempi chiari e parametri descritti.
+
+Aiuta a prevenire errori: chi usa l’API sa che tipo di dato aspettarsi e che valori sono validi.
+
+

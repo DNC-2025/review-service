@@ -1,0 +1,17 @@
+Filtri : 
+Servono a restringere i dati restituiti in base a criteri specifici.
+
+Ordinamento (Sorting) : 
+Serve a definire l’ordine dei record restituiti.
+
+Esempio: “le recensioni più recenti prima” o “dal rating più alto al più basso”.
+In SQLAlchemy si usa .order_by(). Per ordine discendente si fa .order_by(Model.col.desc()).
+
+Perché è utile insieme alla paginazione : 
+Senza ordinamento, la paginazione può restituire dati “disordinati” o non coerenti tra richieste.
+I filtri permettono all’utente di ottenere esattamente ciò che gli serve senza scaricare tutto il DB.
+
+Implementazione pratica :
+Si possono aggiungere parametri opzionali negli endpoint (rating_min, rating_max, sort_by, sort_order) e usarli nella query SQLAlchemy.
+Si combinano con paginazione usando .limit() e .offset().
+
