@@ -30,5 +30,5 @@ def read_root():
     return {"message": "Benvenuto al Review-Service API. Usa /docs per vedere gli endpoint disponibili."}
 
 # il router per le recensioni
-app.include_router(review_router)   # ** Senza questo comando, gli endpoint non funzionano.**  Diciamo come il base metadata create all.
+app.include_router(review_router , prefix="/api")   # ** Senza questo comando, gli endpoint non funzionano.**  Diciamo come il base metadata create all.
 
