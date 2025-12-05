@@ -7,5 +7,8 @@ class ResponseModel(GenericModel, Generic[T]):
     success: bool
     message: Optional[str] = None
     data: Optional[T] = None
+    status_code: Optional[int] = None
+
+    
 
 

@@ -1,0 +1,67 @@
+I CORS (Cross-Origin Resource Sharing) sono uno di quei concetti che spesso sembrano magici (o maledetti) finché non li comprendi davvero.
+Ma una volta capiti, diventano semplici: sono solo regole di sicurezza dei browser.
+
+ Idea chiave:
+I CORS non servono al server, servono al browser.
+Sono una barriera di sicurezza che impedisce a un sito web di fare richieste a un altro sito senza permesso.
+
+🧠 Perché servono
+
+Senza CORS, un sito malevolo potrebbe:
+fare richieste nascoste al tuo server,
+rubare dati,
+inviare comandi a tua insaputa.
+
+Quindi il browser dice sempre:
+“OK… ma chi ti ha dato il permesso di chiamare questo server?”
+È qui che entra in gioco il CORS:
+il server deve esplicitamente autorizzare il frontend a parlare con lui.
+
+Rate Limiting – Limitazione delle richieste
+🎓 Cosa rappresenta (visione accademica)
+Il Rate Limiting è una tecnica per controllare la quantità di richieste che uno user o un IP può fare in un certo intervallo temporale.
+
+
+3 Logging – L^arte di capire cosa accade nel tuo servizio
+🎓 Spiegazione accademica
+
+Il logging è il processo con cui un sistema:
+registra eventi,
+segnala errori,
+conserva tracce,
+produce cronologie utili a debugging e diagnostica.
+Un sistema senza logging è come un^automobile senza cruscotto:
+non sai se stai andando bene, se stai surriscaldando il motore o stai per finire la benzina.
+
+4️ Validazione avanzata con Pydantic
+🎓 Spiegazione accademica
+
+Pydantic è un sistema di definizione e validazione dei dati basato su:
+annotazioni di tipo (type hints),
+validatori,
+parsing coerente.
+Viene considerato uno degli standard moderni per API Python perché:
+evita dati sporchi,
+impedisce che valori non validi raggiungano il database,
+documenta automaticamente tutto con Swagger.
+
+🔍 Validazione personalizzata
+Oltre ai tipi di base (string, int, float), puoi:
+forzare lunghezze minime,
+applicare regex,
+verificare condizioni,
+prevenire strutture errate.
+
+5️ Caching – Memorizzazione dei risultati in memoria
+🎓 Spiegazione accademica
+
+Il caching è un principio antico dell^informatica:
+memorizzare temporaneamente risultati costosi, così da evitarne la rielaborazione.
+Cache = memoria veloce
+Database = memoria lenta
+
+Il caching riduce:
+latenza (tempo di risposta),
+carico sul database,
+banda utilizzata.
+

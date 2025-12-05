@@ -1,16 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
+from typing import List
+
 from app.database.config import get_db
 from app.schemas.review_schemas import ReviewCreate, ReviewUpdate, ReviewResponse
 from app.schemas.response_model import ResponseModel
-from typing import List  
+from app.schemas.pagination import PaginatedResponse
 from app.crud.crud_review import (
     create_review,
     get_review_by_id,
     get_reviews_by_user,
     get_reviews_by_content,
     update_review,
-    delete_review
+    delete_review,
+    paginated_reviews
 )
 
 router = APIRouter(
@@ -18,10 +21,6 @@ router = APIRouter(
     tags=["Reviews"],
     responses={404: {"description": "Not Found"}}
 )
-from fastapi import Query
-from app.schemas.pagination import PaginatedResponse
-from app.crud.crud_review import paginated_reviews
-
 
 # ---------------------------- CREATE ---------------------------------
 @router.post(
@@ -29,7 +28,7 @@ from app.crud.crud_review import paginated_reviews
     response_model=ResponseModel[ReviewResponse],
     summary="Crea una nuova recensione",
     description="Permette di creare una nuova recensione associata ad un utente e un contenuto.",
-    status_code=201,
+    status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": "Recensione creata con successo"},
         400: {"description": "Dati non validi"},
@@ -37,6 +36,7 @@ from app.crud.crud_review import paginated_reviews
     }
 )
 def create_review_endpoint(review_data: ReviewCreate, db: Session = Depends(get_db)):
+    # Creo la recensione
     review = create_review(
         db=db,
         user_id=review_data.user_id,
@@ -44,7 +44,12 @@ def create_review_endpoint(review_data: ReviewCreate, db: Session = Depends(get_
         rating=review_data.rating,
         review_text=review_data.review_text
     )
-    return ResponseModel(success=True, message="Review created successfully", data=review)
+    return ResponseModel(
+        success=True,
+        message="Review created successfully",
+        data=review,
+        status_code=status.HTTP_201_CREATED
+    )
 
 # ---------------------------- READ by ID -----------------------------
 @router.get(
@@ -58,10 +63,16 @@ def create_review_endpoint(review_data: ReviewCreate, db: Session = Depends(get_
     }
 )
 def get_review_by_id_endpoint(review_id: int, db: Session = Depends(get_db)):
+    # Recupero recensione
     review = get_review_by_id(db, review_id)
     if not review:
-        raise HTTPException(status_code=404, detail="Review not found")
-    return ResponseModel(success=True, data=review)
+        return ResponseModel(
+            success=False,
+            message="Review not found",
+            data=None,
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+    return ResponseModel(success=True, data=review, status_code=status.HTTP_200_OK)
 
 # ---------------------------- READ by USER ---------------------------
 @router.get(
@@ -72,7 +83,7 @@ def get_review_by_id_endpoint(review_id: int, db: Session = Depends(get_db)):
 )
 def get_reviews_by_user_endpoint(user_id: int, db: Session = Depends(get_db)):
     reviews = get_reviews_by_user(db, user_id)
-    return ResponseModel(success=True, data=reviews)
+    return ResponseModel(success=True, data=reviews, status_code=status.HTTP_200_OK)
 
 # ---------------------------- READ by CONTENT ------------------------
 @router.get(
@@ -83,7 +94,7 @@ def get_reviews_by_user_endpoint(user_id: int, db: Session = Depends(get_db)):
 )
 def get_reviews_by_content_endpoint(content_id: int, db: Session = Depends(get_db)):
     reviews = get_reviews_by_content(db, content_id)
-    return ResponseModel(success=True, data=reviews)
+    return ResponseModel(success=True, data=reviews, status_code=status.HTTP_200_OK)
 
 # ---------------------------- UPDATE --------------------------------
 @router.put(
@@ -98,6 +109,7 @@ def get_reviews_by_content_endpoint(content_id: int, db: Session = Depends(get_d
     }
 )
 def update_review_endpoint(review_id: int, update_data: ReviewUpdate, db: Session = Depends(get_db)):
+    # Aggiorno la recensione
     review = update_review(
         db=db,
         review_id=review_id,
@@ -105,8 +117,13 @@ def update_review_endpoint(review_id: int, update_data: ReviewUpdate, db: Sessio
         review_text=update_data.review_text
     )
     if not review:
-        raise HTTPException(status_code=404, detail="Review not found")
-    return ResponseModel(success=True, message="Review updated successfully", data=review)
+        return ResponseModel(
+            success=False,
+            message="Review not found",
+            data=None,
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+    return ResponseModel(success=True, message="Review updated successfully", data=review, status_code=status.HTTP_200_OK)
 
 # ---------------------------- DELETE --------------------------------
 @router.delete(
@@ -120,10 +137,16 @@ def update_review_endpoint(review_id: int, update_data: ReviewUpdate, db: Sessio
     }
 )
 def delete_review_endpoint(review_id: int, db: Session = Depends(get_db)):
+    # Elimino recensione
     review = delete_review(db, review_id)
     if not review:
-        raise HTTPException(status_code=404, detail="Review not found")
-    return ResponseModel(success=True, message="Review deleted successfully")
+        return ResponseModel(
+            success=False,
+            message="Review not found",
+            data=None,
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+    return ResponseModel(success=True, message="Review deleted successfully", status_code=status.HTTP_200_OK)
 
 # ------------------------- PAGINATION by USER -----------------------
 @router.get(
@@ -141,6 +164,7 @@ def get_reviews_by_user_paginated_endpoint(
     order_desc: bool = Query(False, description="True per ordinamento discendente"),
     db: Session = Depends(get_db)
 ):
+    # Lista paginata
     result = paginated_reviews(
         db=db,
         user_id=user_id,
@@ -150,7 +174,7 @@ def get_reviews_by_user_paginated_endpoint(
         order_by=order_by,
         order_desc=order_desc
     )
-    return ResponseModel(success=True, data=result)
+    return ResponseModel(success=True, data=result, status_code=status.HTTP_200_OK)
 
 # ------------------------- PAGINATION by CONTENT -----------------------
 @router.get(
@@ -168,6 +192,7 @@ def get_reviews_by_content_paginated_endpoint(
     order_desc: bool = Query(True, description="True per ordinamento discendente"),
     db: Session = Depends(get_db)
 ):
+    # Lista paginata
     result = paginated_reviews(
         db=db,
         user_id=None,
@@ -177,5 +202,4 @@ def get_reviews_by_content_paginated_endpoint(
         order_by=order_by,
         order_desc=order_desc
     )
-    return ResponseModel(success=True, data=result)
- 
+    return ResponseModel(success=True, data=result, status_code=status.HTTP_200_OK)
