@@ -53,3 +53,6 @@ def read_root():
 
 # il router per le recensioni
 app.include_router(review_router )   # ** Senza questo comando, gli endpoint non funzionano.**  Diciamo come il base metadata create all.
+
+
+ 
