@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, Request  # <-- aggiunto Request
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -15,6 +15,8 @@ from app.crud.crud_review import (
     delete_review,
     paginated_reviews
 )
+from app.core.rate_limiter import limiter
+from app.core.logger import logger  # <-- import logger
 
 router = APIRouter(
     prefix="/reviews",
@@ -35,8 +37,9 @@ router = APIRouter(
         500: {"description": "Errore interno del server"}
     }
 )
-def create_review_endpoint(review_data: ReviewCreate, db: Session = Depends(get_db)):
-    # Creo la recensione
+@limiter.limit("3/minute")
+def create_review_endpoint(request: Request, review_data: ReviewCreate, db: Session = Depends(get_db)):
+    logger.info(f"[CREATE] Richiesta creazione recensione user_id={review_data.user_id}, content_id={review_data.content_id}")
     review = create_review(
         db=db,
         user_id=review_data.user_id,
@@ -44,6 +47,7 @@ def create_review_endpoint(review_data: ReviewCreate, db: Session = Depends(get_
         rating=review_data.rating,
         review_text=review_data.review_text
     )
+    logger.success(f"[CREATE] Recensione creata con id={review.id}")
     return ResponseModel(
         success=True,
         message="Review created successfully",
@@ -62,16 +66,19 @@ def create_review_endpoint(review_data: ReviewCreate, db: Session = Depends(get_
         404: {"description": "Recensione non trovata"}
     }
 )
-def get_review_by_id_endpoint(review_id: int, db: Session = Depends(get_db)):
-    # Recupero recensione
+@limiter.limit("10/minute")
+def get_review_by_id_endpoint(request: Request, review_id: int, db: Session = Depends(get_db)):
+    logger.info(f"[READ] Richiesta recensione id={review_id}")
     review = get_review_by_id(db, review_id)
     if not review:
+        logger.warning(f"[READ] Recensione non trovata: id={review_id}")
         return ResponseModel(
             success=False,
             message="Review not found",
             data=None,
             status_code=status.HTTP_404_NOT_FOUND
         )
+    logger.info(f"[READ] Recensione trovata: id={review_id}")
     return ResponseModel(success=True, data=review, status_code=status.HTTP_200_OK)
 
 # ---------------------------- READ by USER ---------------------------
@@ -81,7 +88,9 @@ def get_review_by_id_endpoint(review_id: int, db: Session = Depends(get_db)):
     summary="Ottieni recensioni tramite User ID",
     description="Restituisce tutte le recensioni create da uno specifico utente.",
 )
-def get_reviews_by_user_endpoint(user_id: int, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def get_reviews_by_user_endpoint(request: Request, user_id: int, db: Session = Depends(get_db)):
+    logger.info(f"[READ] Richiesta recensioni per user_id={user_id}")
     reviews = get_reviews_by_user(db, user_id)
     return ResponseModel(success=True, data=reviews, status_code=status.HTTP_200_OK)
 
@@ -92,7 +101,9 @@ def get_reviews_by_user_endpoint(user_id: int, db: Session = Depends(get_db)):
     summary="Ottieni recensioni tramite Content ID",
     description="Restituisce tutte le recensioni relative ad uno specifico contenuto.",
 )
-def get_reviews_by_content_endpoint(content_id: int, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def get_reviews_by_content_endpoint(request: Request, content_id: int, db: Session = Depends(get_db)):
+    logger.info(f"[READ] Richiesta recensioni per content_id={content_id}")
     reviews = get_reviews_by_content(db, content_id)
     return ResponseModel(success=True, data=reviews, status_code=status.HTTP_200_OK)
 
@@ -108,8 +119,9 @@ def get_reviews_by_content_endpoint(content_id: int, db: Session = Depends(get_d
         400: {"description": "Dati non validi"}
     }
 )
-def update_review_endpoint(review_id: int, update_data: ReviewUpdate, db: Session = Depends(get_db)):
-    # Aggiorno la recensione
+@limiter.limit("5/minute")
+def update_review_endpoint(request: Request, review_id: int, update_data: ReviewUpdate, db: Session = Depends(get_db)):
+    logger.info(f"[UPDATE] Richiesta aggiornamento recensione id={review_id}")
     review = update_review(
         db=db,
         review_id=review_id,
@@ -117,12 +129,14 @@ def update_review_endpoint(review_id: int, update_data: ReviewUpdate, db: Sessio
         review_text=update_data.review_text
     )
     if not review:
+        logger.warning(f"[UPDATE] Recensione non trovata: id={review_id}")
         return ResponseModel(
             success=False,
             message="Review not found",
             data=None,
             status_code=status.HTTP_404_NOT_FOUND
         )
+    logger.success(f"[UPDATE] Recensione aggiornata: id={review_id}")
     return ResponseModel(success=True, message="Review updated successfully", data=review, status_code=status.HTTP_200_OK)
 
 # ---------------------------- DELETE --------------------------------
@@ -136,16 +150,19 @@ def update_review_endpoint(review_id: int, update_data: ReviewUpdate, db: Sessio
         404: {"description": "Recensione non trovata"}
     }
 )
-def delete_review_endpoint(review_id: int, db: Session = Depends(get_db)):
-    # Elimino recensione
+@limiter.limit("3/minute")
+def delete_review_endpoint(request: Request, review_id: int, db: Session = Depends(get_db)):
+    logger.info(f"[DELETE] Richiesta eliminazione recensione id={review_id}")
     review = delete_review(db, review_id)
     if not review:
+        logger.warning(f"[DELETE] Recensione non trovata: id={review_id}")
         return ResponseModel(
             success=False,
             message="Review not found",
             data=None,
             status_code=status.HTTP_404_NOT_FOUND
         )
+    logger.success(f"[DELETE] Recensione eliminata: id={review_id}")
     return ResponseModel(success=True, message="Review deleted successfully", status_code=status.HTTP_200_OK)
 
 # ------------------------- PAGINATION by USER -----------------------
@@ -156,7 +173,9 @@ def delete_review_endpoint(review_id: int, db: Session = Depends(get_db)):
     description="Restituisce le recensioni di un utente in formato paginato, con ordinamento e filtri opzionali.",
     responses={200: {"description": "Lista paginata restituita con successo"}}
 )
+@limiter.limit("10/minute")
 def get_reviews_by_user_paginated_endpoint(
+    request: Request,
     user_id: int,
     limit: int = Query(20, ge=1, le=100, description="Numero massimo di elementi da restituire"),
     offset: int = Query(0, ge=0, description="Offset degli elementi"),
@@ -164,7 +183,7 @@ def get_reviews_by_user_paginated_endpoint(
     order_desc: bool = Query(False, description="True per ordinamento discendente"),
     db: Session = Depends(get_db)
 ):
-    # Lista paginata
+    logger.info(f"[PAGINATION] Richiesta recensioni paginate per user_id={user_id}")
     result = paginated_reviews(
         db=db,
         user_id=user_id,
@@ -184,7 +203,9 @@ def get_reviews_by_user_paginated_endpoint(
     description="Restituisce le recensioni di un contenuto in formato paginato, con ordinamento e filtri opzionali.",
     responses={200: {"description": "Lista paginata restituita con successo"}}
 )
+@limiter.limit("10/minute")
 def get_reviews_by_content_paginated_endpoint(
+    request: Request,
     content_id: int,
     limit: int = Query(20, ge=1, le=100, description="Numero massimo di elementi da restituire"),
     offset: int = Query(0, ge=0, description="Offset degli elementi"),
@@ -192,7 +213,7 @@ def get_reviews_by_content_paginated_endpoint(
     order_desc: bool = Query(True, description="True per ordinamento discendente"),
     db: Session = Depends(get_db)
 ):
-    # Lista paginata
+    logger.info(f"[PAGINATION] Richiesta recensioni paginate per content_id={content_id}")
     result = paginated_reviews(
         db=db,
         user_id=None,
