@@ -1,0 +1,14 @@
+Pydantic Validators
+
+Cosa sono :
+I validators di Pydantic sono metodi o funzioni che servono a validare o trasformare i dati quando vengono passati ai modelli Pydantic (BaseModel).
+Possono essere pre (prima della creazione del modello) o post (dopo la creazione).
+Permettono di controllare regole complesse, come vincoli condizionali o trasformazioni di campo.
+
+Perché usarli : 
+Garantire che i dati in ingresso siano validi e coerenti.
+Evitare errori lato database o logica dell’applicazione.
+Ridurre codice ridondante: tutte le regole sono centralizzate nei modelli.
+Supportare validazioni condizionali (ad esempio: se rating basso, review_text obbligatorio).
+
+

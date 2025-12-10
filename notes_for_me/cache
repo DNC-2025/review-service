@@ -1,0 +1,11 @@
+Caching (cache in memoria)
+
+Cosa è :
+Il caching è una tecnica per memorizzare temporaneamente i risultati di operazioni costose (come query al database), così da rispondere più velocemente alle richieste successive.
+Nel tuo progetto usi cachetools con TTL (Time To Live).
+Chiavi univoche per ogni query permettono di identificare rapidamente i dati memorizzati.
+
+Perché usarlo : 
+Riduce il carico sul database per GET pesanti (es. /by-user, /by-content, paginati).
+Migliora la performance e la reattività del servizio.
+Aiuta a mantenere un flusso operativo fluido anche con molti utenti.
