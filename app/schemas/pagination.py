@@ -1,4 +1,3 @@
-# app/schemas/pagination.py
 from typing import Generic, List, Optional, TypeVar
 from pydantic import BaseModel
 from pydantic.generics import GenericModel

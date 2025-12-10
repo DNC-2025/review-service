@@ -1,0 +1,24 @@
+Rate limiter : 
+
+Come funziona : 
+slowapi controlla quante richieste provengono dallo stesso IP.
+Ogni endpoint può avere un limite diverso.
+Se l’IP supera il limite, l’API restituisce automaticamente un errore 429 Too Many Requests.
+
+Perché lo facciamo :
+Protegge l’API da spam, abusi o attacchi DoS.
+Evita sovraccarico del server e consumo eccessivo del database.
+
+
+Logging :
+
+Come funziona :
+logger.info() → log informativo generale
+logger.success() → log positivo di un’operazione riuscita
+logger.warning() → log di situazioni anomale o non critiche
+Tutti i log possono essere scritti su file, console, o sistemi centralizzati.
+
+Perché lo facciamo  :
+Permette monitoraggio in tempo reale
+Aiuta a debug e tracciamento errori.
+Documenta automaticamente operazioni critiche senza dover aggiungere print manuali.

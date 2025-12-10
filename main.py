@@ -10,10 +10,11 @@ from exceptions.handlers import (
 )
 from sqlalchemy.exc import SQLAlchemyError    # <-- IMPORT CORRETTO (prima era sbagliato)
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.rate_limiter import init_rate_limiter
+from app.core.logger import logger 
 
 
-print("Table 'review' creata correttamente")
-
+logger.info("Avvio del Review-Service API")
 app = FastAPI(title="Review-Service" ,
               description="Servizio per la gestione delle recensioni",
               version="1.0.0")
@@ -29,12 +30,17 @@ app.add_middleware(
     allow_origins=origins,          # Origini consentite
     allow_credentials=True,         # Permette cookie / autenticazione
     allow_methods=["GET", "POST", "PUT", "DELETE"],   # Metodi ammessi
-    allow_headers=["*"],            # Header ammessi
+    allow_headers=["*"]            # Header ammessi / "*" vuole dire (all) 
 )
+
+#-------- Rate limiter -----------
+init_rate_limiter(app)
 
 # crea tutte le tabelle dei modelli importati
 Base.metadata.create_all(bind=engine)
-
+logger.info("creazione delle tabelle nel db , (workbench)")
+#print("Table 'review' creata correttamente") se si usa loguru allora queste print di conferma non servono piu. 
+logger.success("Tabelle create correttamente")
 
 # E qui  ci sono li   global handlers 
 app.add_exception_handler(HTTPException, http_exception_handler)
@@ -47,3 +53,6 @@ def read_root():
 
 # il router per le recensioni
 app.include_router(review_router )   # ** Senza questo comando, gli endpoint non funzionano.**  Diciamo come il base metadata create all.
+
+
+ 
