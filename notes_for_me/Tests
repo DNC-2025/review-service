@@ -1,0 +1,27 @@
+-Testing con pytest + FastAPI : 
+
+I test servono a verificare che ogni componente dell’app funzioni come previsto e continui a farlo dopo modifiche.
+Si dividono in unit test (testano funzioni interne in isolamento) e integration test (testano più componenti insieme, es. API → service → DB).
+Con FastAPI si usa TestClient, che simula richieste HTTP reali senza avviare un server.
+Un buon set di test deve coprire:
+casi di successo
+casi di errore
+validazioni / edge cases
+Ogni test deve controllare codici di stato, struttura della risposta, e valori ritornati.
+Un database SQLite in memoria permette test rapidi, puliti e senza effetti collaterali.
+
+
+
+
+
+-Applicazione al nostro progetto :
+
+Abbiamo creato un conftest.py che fornisce:
+un DB SQLite in memoria per unit test
+un TestClient per i test di integrazione
+I test unitari verificano direttamente il CRUD: create, get, update, delete.
+I test API verificano tutti gli endpoint /reviews/ simulando vere richieste HTTP.
+Ogni endpoint ha test sia di successo che di errore (404, 422).
+Sono coperti anche i casi limite: rating fuori range, testo vuoto, campi mancanti.
+I test verificano che il formato JSON e i codici HTTP siano corretti (201, 200, 204, 404, 422).
+La suite complessiva soddisfa pienamente i requisiti: unit test + integrazione + validazioni + corrette risposte API.
