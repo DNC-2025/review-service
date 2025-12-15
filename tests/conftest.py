@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from app.models.tables import Base
 from fastapi.testclient import TestClient
 from main import app
-
+from app.database import get_db
 
 @pytest.fixture()
 def db_session():
@@ -25,16 +25,8 @@ def db_session():
 
 @pytest.fixture()
 def client(db_session):
-
-    # Override della dipendenza del DB usata dagli endpoint
-    def override_get_db():
-        try:
-            yield db_session
-        finally:
-            pass
-
-    # IMPORTANTE: qui non usiamo get_test_db ma get_db!
-    from app.database import get_db
-    app.dependency_overrides[get_db] = override_get_db
-
-    return TestClient(app)
+    # Override la dipendenza get_db con la sessione di test
+    app.dependency_overrides[get_db] = lambda: db_session
+    with TestClient(app) as client:
+        yield client
+    app.dependency_overrides.clear()
