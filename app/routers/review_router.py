@@ -28,7 +28,7 @@ router = APIRouter(
 # ---------------------------- CREATE ---------------------------------
 @router.post(
     "/",
-    response_model=ReviewResponse,
+    response_model=ResponseModel[ReviewResponse],  # <-- AGGIUNGI ResponseModel[]
     summary="Crea una nuova recensione",
     description="Permette di creare una nuova recensione associata ad un utente e un contenuto.",
     status_code=status.HTTP_201_CREATED,
