@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Local databases
+*.db
+
+# Editors / OS
+.vscode/
+.DS_Store
+
+
+# Misc junk
+[23
