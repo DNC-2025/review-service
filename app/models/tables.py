@@ -5,7 +5,8 @@ class Review(Base):
     __tablename__ = "review"
     __table_args__ = (CheckConstraint('rating >= 1 AND rating <= 5', name='rating_range_check'),)
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    # app/models/tables.py
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(BigInteger, nullable=False, index=True)       
     content_id = Column(BigInteger, nullable=False, index=True)    
     rating = Column(Integer, nullable=False)

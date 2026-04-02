@@ -10,7 +10,8 @@ from exceptions.handlers import (
 )
 from sqlalchemy.exc import SQLAlchemyError    # <-- IMPORT CORRETTO (prima era sbagliato)
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.rate_limiter import init_rate_limiter
+from slowapi.errors import RateLimitExceeded
+from app.core.rate_limiter import limiter, rate_limit_exceeded_handler 
 from app.core.logger import logger 
 
 
@@ -33,16 +34,13 @@ app.add_middleware(
     allow_headers=["*"]            # Header ammessi / "*" vuole dire (all) 
 )
 
-#-------- Rate limiter -----------
-init_rate_limiter(app)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
-# crea tutte le tabelle dei modelli importati
 Base.metadata.create_all(bind=engine)
-logger.info("creazione delle tabelle nel db , (workbench)")
-#print("Table 'review' creata correttamente") se si usa loguru allora queste print di conferma non servono piu. 
+logger.info("creazione delle tabelle nel db , (workbench)") 
 logger.success("Tabelle create correttamente")
 
-# E qui  ci sono li   global handlers 
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
@@ -51,7 +49,6 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 def read_root():
     return {"message": "Benvenuto al Review-Service API. Usa /docs per vedere gli endpoint disponibili."}
 
-# il router per le recensioni
 app.include_router(review_router )   # ** Senza questo comando, gli endpoint non funzionano.**  Diciamo come il base metadata create all.
 
 
